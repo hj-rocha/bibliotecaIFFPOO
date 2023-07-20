@@ -38,7 +38,7 @@ public class LivroController {
 		return livroDAO.consultarLivroPorIsbn(isbn);
 	}
 
-	public void atualizar(Livro livro, String ISBNAtual) {
+	public void atualizar(Livro livro, String ISBNAtual) throws Exception {
 		livroDAO.atualizar(livro, ISBNAtual);
 	}
 

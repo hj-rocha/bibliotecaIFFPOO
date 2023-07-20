@@ -12,7 +12,7 @@ public class EmprestimoController {
 
 	EmprestimoDAO emprestimoDAO = new EmprestimoDAO();
 
-	public String emprestarLivro(String ISBN, String CPF) {
+	public String emprestarLivro(String ISBN, String CPF) throws Exception {
 		return emprestimoDAO.emprestarLivro(ISBN, CPF);
 	}
 
@@ -28,11 +28,8 @@ public class EmprestimoController {
 		emprestimoDAO.apagar(cpf);
 	}
 
-	public void atualizar(String CPFAtual, String nomeNovo, String CPFNovo) {
-		// Emprestimo emprestimo = new Emprestimo();
-		// emprestimo.setCPF(CPFNovo);
-		// mprestimo.setNome(nomeNovo);
-		// emprestimoDAO.atualizar(emprestimo, CPFAtual);
+	public void atualizar(Emprestimo emprestimo) {
+		emprestimoDAO.atualizar(emprestimo);
 	}
 
 	public List<Emprestimo> listar() {

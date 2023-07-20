@@ -24,7 +24,7 @@ public class UsuarioDAO {
 			throw new Exception("CPF errado!");
 		}
 		if (existeUsuario(usuario)) {
-			throw new Exception("CPF a cadastrado!");
+			throw new Exception("CPF ja cadastrado!");
 		}
 		try {
 			PreparedStatement ps = connection.prepareStatement("INSERT INTO usuario (nome, cpf) VALUES (?, ?)");
@@ -32,7 +32,7 @@ public class UsuarioDAO {
 			ps.setString(2, usuario.getCPF());
 			ps.execute();
 		} catch (Exception e) {
-
+			throw new Exception("Falha ao cadastrar usuário. "+e.getMessage());
 		}
 		return usuario;
 	}
@@ -71,7 +71,7 @@ public class UsuarioDAO {
 		}
 	}
 
-	public void atualizar(Usuario usuario, String CPFAtual) {
+	public void atualizar(Usuario usuario, String CPFAtual) throws Exception {
 
 		try {
 			if (Usuario.validarCPF(usuario.getCPF())) {
@@ -80,10 +80,9 @@ public class UsuarioDAO {
 				ps.setString(1, usuario.getCPF());
 				ps.setString(2, usuario.getNome());
 				ps.setString(3, CPFAtual);
-				System.out.println("Atualização concluida");
 				ps.executeUpdate();
 			} else {
-				System.out.println("CPF inválido!");
+				throw new Exception("CPF invalido.");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

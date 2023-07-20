@@ -1,7 +1,6 @@
 package biblioteca.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,7 +11,6 @@ import biblioteca.ISBNValidator;
 import biblioteca.JDBCConnection;
 import biblioteca.model.Editora;
 import biblioteca.model.Livro;
-import biblioteca.model.Usuario;
 
 public class LivroDAO {
 
@@ -63,7 +61,7 @@ public class LivroDAO {
 
 	}
 
-	public void atualizar(Livro livro, String ISBNAtual) {
+	public void atualizar(Livro livro, String ISBNAtual) throws Exception {
 		PreparedStatement ps;
 		try {
 			// TODO: fazer a validação do ISBN antes da atualização dos dados
@@ -77,16 +75,19 @@ public class LivroDAO {
 				ps.setBoolean(5, livro.getDisponivelParaEmprestimo());
 				ps.executeUpdate();
 			} else {
-				System.out.println("ISBN inválido!");
+				throw new Exception("ISBN inválido!");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public Boolean atualizarDisponibilidadeDoLivro(Boolean d, String ISBNAtual) {
+	public Boolean atualizarDisponibilidadeDoLivro(Boolean d, String ISBNAtual) throws Exception {
 		PreparedStatement ps;
 		try {
+			if (ISBNValidator.validadorISBN(ISBNAtual)) {
+				throw new Exception("ISBN inválido!");			
+			}
 			// TODO: fazer a validação do ISBN antes da atualização dos dados
 			ps = connection.prepareStatement("UPDATE livro SET " + "disponivel_para_emprestimo = ? WHERE ISBN = ? ");
 			ps.setBoolean(1, d);

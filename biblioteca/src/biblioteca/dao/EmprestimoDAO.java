@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import biblioteca.JDBCConnection;
@@ -34,7 +33,6 @@ public class EmprestimoDAO {
 							+ " usuario_id, livro_id, emprestado)" + " VALUES (?,?,?,?,?)");
 			ps.setInt(1, emprestimo.getPrazoEmprestimo());
 			ps.setDate(2, java.sql.Date.valueOf(java.time.LocalDate.now()));
-
 			ps.setInt(3, emprestimo.getUsuario().getId());
 			ps.setInt(4, emprestimo.getLivro().getId());
 			ps.setBoolean(5, emprestimo.getEmprestado());
@@ -46,7 +44,7 @@ public class EmprestimoDAO {
 	}
 
 	public List<Emprestimo> consultarPorCPF(String cpf) {
-		List<Emprestimo> listaEmprestimos = new LinkedList<>();
+		List<Emprestimo> listaEmprestimos = new ArrayList<Emprestimo>();
 
 		try {
 			PreparedStatement ps = connection.prepareStatement("SELECT * FROM emprestimo WHERE cpf = ?");
@@ -54,12 +52,19 @@ public class EmprestimoDAO {
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				String nomeEmprestimo = rs.getString("nome");
-				String cpfEmprestimo = rs.getString("cpf");
-				Emprestimo user = new Emprestimo();
-				// user.setCPF(cpfEmprestimo);
-				// user.setNome(nomeEmprestimo);
-				listaEmprestimos.add(user);
+				Emprestimo emprestimo = new Emprestimo();
+				emprestimo.setId(rs.getInt("id"));
+				emprestimo.setPrazoEmprestimo(rs.getInt("prazo_emprestimo"));
+				emprestimo.setDataEmprestimo(rs.getDate("data_emprestimo").toLocalDate());
+				emprestimo.setDataDevolucao(rs.getDate("data_deveolucao").toLocalDate());
+				Usuario usuario = new Usuario();
+				usuario.setId(rs.getInt("usuario_id"));
+				emprestimo.setUsuario(usuario);
+				Livro livro = new Livro();
+				livro.setId(rs.getInt("livro_id"));
+				emprestimo.setLivro(livro);
+				emprestimo.setEmprestado(rs.getBoolean("emprestado"));
+				listaEmprestimos.add(emprestimo);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -72,7 +77,6 @@ public class EmprestimoDAO {
 			PreparedStatement ps = connection.prepareStatement("DELETE FROM emprestimo WHERE id = ?");
 			ps.setString(1, id);
 			ps.executeUpdate();
-			System.out.println("Remoção concluida");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -102,17 +106,16 @@ public class EmprestimoDAO {
 				l.setId(result.getInt(6));
 				emprestimo.setLivro(l);
 				emprestimo.setEmprestado(result.getBoolean(7));
-
 				emprestimos.add(emprestimo);
 			} while (result.next());
 			return emprestimos;
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
 		}
+		return null;
 	}
 
-	public String emprestarLivro(String ISBN, String CPF) {
+	public String emprestarLivro(String ISBN, String CPF) throws Exception {
 
 		if (usuarioTemEmprestimoAtrasado(CPF)) {
 			return "Nao emprestado. Usuario com atrasos.";
@@ -155,7 +158,6 @@ public class EmprestimoDAO {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
 		}
 
 		return "Livro devolvido";
@@ -180,9 +182,7 @@ public class EmprestimoDAO {
 			}
 			for (Emprestimo emprestimo2 : emprestimos) {
 				Period periodo = Period.between(emprestimo2.getDataEmprestimo(), LocalDate.now());
-				// System.out.println(emprestimo2.getPrazoEmprestimo());
-				// System.out.println(periodo.getDays());
-				if (periodo.getDays() > emprestimo2.prazoEmprestimo) {
+				if (periodo.getDays() > emprestimo2.getPrazoEmprestimo()) {
 					// Retorna true se o usuario tem um emprestimo atrasado.
 					return true;
 				}
@@ -303,9 +303,9 @@ public class EmprestimoDAO {
 				if (emprestimo.getEmprestado().equals(true)) {
 					// https://www.devmedia.com.br/como-manipular-datas-com-o-java-8/34135
 					Period periodo = Period.between(emprestimo.getDataEmprestimo(), LocalDate.now());
-//					if(periodo.getDays()>Emprestimo.prazoEmprestimo) {
-					emp.add(emprestimo);
-//					}
+					if (periodo.getDays() > emprestimo.getPrazoEmprestimo()) {
+						emp.add(emprestimo);
+					}
 				}
 			}
 			return emp;
@@ -314,4 +314,26 @@ public class EmprestimoDAO {
 			return null;
 		}
 	}
+
+	public void atualizar(Emprestimo emprestimo) {
+
+		try {
+			PreparedStatement ps = connection.prepareStatement("UPDATE emprestimo SET prazo_emprestimo = ?"
+					+ "data_emprestimo = ?, data_devolucao = ?, usuario_id = ?, livro_id = ?, emprestado = ? "
+					+ " WHERE id = ? ");
+			ps.setInt(1, emprestimo.getPrazoEmprestimo());
+			ps.setDate(2, java.sql.Date.valueOf(emprestimo.getDataEmprestimo()));
+			ps.setDate(3, java.sql.Date.valueOf(emprestimo.getDataDevolucao()));
+			ps.setInt(4, emprestimo.getUsuario().getId());
+			ps.setInt(5, emprestimo.getLivro().getId());
+			ps.setBoolean(6, emprestimo.getEmprestado());
+			ps.executeUpdate();
+
+		} catch (
+
+		SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

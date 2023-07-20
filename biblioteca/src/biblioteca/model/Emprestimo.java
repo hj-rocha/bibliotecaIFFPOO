@@ -5,8 +5,8 @@ import java.time.LocalDate;
 public class Emprestimo {
 	// https://www.w3schools.com/java/java_date.asp
 
-	public int id;
-	public int prazoEmprestimo = 7;
+	private int id;
+	private int prazoEmprestimo = 7;
 	private LocalDate dataEmprestimo;
 	private LocalDate dataDevolucao;
 	private Usuario usuario;

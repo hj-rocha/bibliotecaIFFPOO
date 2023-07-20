@@ -76,7 +76,6 @@ public class Principal {
 					System.out.println(emprestimo.getId() + " : " + emprestimo.getDataEmprestimo());
 				}
 			}
-
 			if (opcao.equals("5")) {
 				System.out.println("Digite o CPF do usuario");
 				String CPF = scan.next();
@@ -157,7 +156,7 @@ public class Principal {
 			if (opcao.equals("11")) {
 				List<Emprestimo> emprestimos = emprestimoController.listar();
 				for (Emprestimo emprestimo : emprestimos) {
-					System.out.println(emprestimo.getDataEmprestimo() + " : " + emprestimo.getLivro().getId() + " : "
+					System.out.println(emprestimo.getId()+" : "+  emprestimo.getDataEmprestimo() + " : " + emprestimo.getLivro().getId() + " : "
 							+ emprestimo.getUsuario().getId());
 				}
 			}

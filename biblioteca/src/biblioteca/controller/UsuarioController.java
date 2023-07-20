@@ -27,7 +27,7 @@ public class UsuarioController {
 		usuarioDAO.apagar(cpf);
 	}
 
-	public void atualizar(String CPFAtual, String nomeNovo, String CPFNovo) {
+	public void atualizar(String CPFAtual, String nomeNovo, String CPFNovo) throws Exception {
 		Usuario usuario = new Usuario();
 		usuario.setCPF(CPFNovo);
 		usuario.setNome(nomeNovo);
